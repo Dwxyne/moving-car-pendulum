@@ -1,0 +1,50 @@
+GlowScript 3.2 VPython
+
+L = .1
+g = 9.8
+m = 0.01
+theta = 30*pi/180
+thetadot = 0
+
+ground = box(pos=vector(.4,-.2,0), height=.03,
+width=.2, length=10, texture=textures.gravel)
+
+roof = box(pos=vector(0,0,0), height=0.01, 
+width=0.02, length=0.03, color=color.red)
+
+pivot = sphere(pos=vector(0,-.007,0),
+radius=0.002)
+
+mass = sphere(pos=vector(L*sin(theta), -L*cos(theta),0),
+color=color.yellow, radius=0.005, make_trail=True)
+
+string = cylinder(pos=pivot.pos,
+axis=mass.pos-pivot.pos, radius=.001)
+
+t = 0
+dt = 0.01
+roof.v = vector(0,0,0)
+roof.a = vector(0.1,0,0)
+a = mag(roof.a)
+
+scene.camera.follow(pivot)
+scene.range=.2
+
+while t<8:
+  rate(100)
+  roof.pos = .5*roof.a*t**2 #roof.pos + roof.v*t + .5*roof.a*t**2
+  pivot.pos = roof.pos - vector(0,.007,0)
+  
+  thetaddot = -t*a*thetadot*sin(theta)/L - g*sin(theta)/L - a*(cos(theta)-t*sin(theta))/L
+  thetadot = thetadot + thetaddot*dt
+  theta = theta + thetadot*dt
+  
+  x = L*sin(theta) + .5*a*t**2
+  y = -L*cos(theta)
+  
+  mass.pos = vector(x,y,0)
+  
+  string.pos = pivot.pos
+  string.axis = mass.pos - pivot.pos
+  
+  t = t + dt
